@@ -1,0 +1,16 @@
+note over selain:
+Käyttäjä painaa tallenna näppäintä joka aloittaa POST pyynnön
+end note
+note over selain:
+Selain lähettää "new_note_spa" nimiselle osuudelle pyynnön
+joka sisältää JSON-muodossa kaikki tiedot.
+end note
+selain->palvelin: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+note over palvelin:
+Palvelimen komento ottaa vastaan lähetetyn datan,
+jonka jälkeen selaimelle lähetetään response
+end note
+palvelin-->selain: Vastaus koodilla 201: OK 
+note over selain:
+Selain ei turhaa lataile itseään koska vastaus koodi on 201.
+end note

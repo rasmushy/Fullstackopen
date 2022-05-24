@@ -1,0 +1,31 @@
+note over selain:
+Käyttäjä painaa tallenna näppäintä joka aloittaa POST pyynnön
+end note
+note over selain:
+Selain lähettää "new_note" nimiselle osuudelle pyynnön
+end note
+selain->palvelin: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note
+note over palvelin:
+Formin data käsitellään palvelimen app.post komennolla.
+end note
+note over palvelin:
+Aluksi komento lisää olion notes 
+nimiseen taulukkoon seuraavalla tavalla:
+
+1) HTTP POST request headerista 
+saadaan luotua sisältö osuus oliolle.
+Oliolla on kaksi osuutta content ja date.
+Content: osuus saadaan request headerin
+form datasta nimellä note. 
+Date: osuus luodaan new Date() komennolla
+
+2) Lopuksi komento palauttaa 
+uudelleenohjauksen sivulle "notes" 
+(Sivun osoite löytyy: response headerista)
+end note
+palvelin-->selain: Uudelleenohjaus pyyntö response headerin locatioon: '/notes'
+selain->palvelin: HTTP GET https://studies.cs.helsinki.fi/exampleapp/notes
+palvelin-->selain: HTML-koodi
+note over selain:
+Selain lataa uudelleen sivun
+end note
