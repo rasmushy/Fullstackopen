@@ -1,3 +1,5 @@
+@author Rasmus Hyyppä
+
 selain->palvelin: HTTP GET https://studies.cs.helsinki.fi/exampleapp/spa
 palvelin-->selain: HTML-koodi
 selain->palvelin: HTTP GET https://studies.cs.helsinki.fi/exampleapp/main.css
