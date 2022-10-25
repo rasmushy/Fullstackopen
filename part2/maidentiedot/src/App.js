@@ -1,25 +1,19 @@
 // @author rasmushy Rasmus Hyyppä
 import {useState, useEffect} from "react";
 import axios from "axios";
-
-const CountryList = (props) => {
-  let x = ""; //empty string for mapping
-  props.filter === "" ? (x = props.countries) : (x = props.filteredCountry); //if filter input is empty show persons, else show filteredpersons
-
-  //Mapping all the objects in the phonebook
-  return (
-    <div>
-      {x.map((obj, i) => (
-        <p key={i}>{obj.name.common}</p>
-      ))}
-    </div>
-  );
-};
+import CountryList from "./components/CountryList";
 
 function App() {
   const [countries, setCountries] = useState([]);
   const [filter, setFilter] = useState(""); //useState hook for Filter input
-  const [filteredCountry, setFilteredCountry] = useState(countries);
+  const [showCountryButton, setShowCountryButton] = useState();
+
+  const showBut = (event) => {
+    console.log(event.target.value);
+    const contry = countries.filter(country => country.name.common.includes(event.target.value));
+    console.log("contry: ", contry);
+    setShowCountryButton(contry[0]);
+  };
 
   useEffect(() => {
     axios.get("https://restcountries.com/v3.1/all").then((response) => {
@@ -32,17 +26,15 @@ function App() {
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
-    setFilteredCountry(countries.filter((country) => country.name.common.toLowerCase().includes(event.target.value.toLowerCase())));
+    setShowCountryButton(undefined);
   };
 
   return (
     <div>
-      filter shown with <input onChange={handleFilterChange} value={filter}></input>
-      {filteredCountry.length > 10 ? (
-        <p>Too many matches, specify another filter</p>
-      ) : (
-        <CountryList countries={countries} filteredCountry={filteredCountry} />
-      )}
+    <form>
+    Find countries: <input onChange={handleFilterChange} value={filter}></input>
+    </form>
+    <CountryList countries={countries} filter={filter} showCountryButton={showCountryButton} showBut={showBut} />
     </div>
   );
 }
