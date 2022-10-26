@@ -9,10 +9,8 @@ function App() {
   const [showCountryButton, setShowCountryButton] = useState();
 
   const showBut = (event) => {
-    console.log(event.target.value);
-    const contry = countries.filter(country => country.name.common.includes(event.target.value));
-    console.log("contry: ", contry);
-    setShowCountryButton(contry[0]);
+    const country = countries.filter(country => country.name.common.includes(event.target.value));
+    setShowCountryButton(country[0]);
   };
 
   useEffect(() => {
@@ -31,10 +29,10 @@ function App() {
 
   return (
     <div>
-    <form>
-    Find countries: <input onChange={handleFilterChange} value={filter}></input>
-    </form>
-    <CountryList countries={countries} filter={filter} showCountryButton={showCountryButton} showBut={showBut} />
+      <form>
+      Find countries: <input onChange={handleFilterChange} value={filter}></input>
+      </form>
+      <CountryList countries={countries} filter={filter} showCountryButton={showCountryButton} showBut={showBut} />
     </div>
   );
 }
