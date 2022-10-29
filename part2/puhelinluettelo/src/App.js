@@ -3,7 +3,11 @@ import {useState, useEffect} from "react";
 import Persons from "./components/Persons";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
-import axios from "axios";
+import personServices from "./services/personServices";
+import Notification from "./components/Notification";
+import Footer from "./components/Footer";
+
+//npm run server = json-server --port=3001 --watch db.json
 
 const App = () => {
   const [persons, setPersons] = useState([]); //persons
@@ -11,31 +15,101 @@ const App = () => {
   const [newName, setNewName] = useState(""); //useState hook for newNames, part of the form for Person
   const [newNumber, setNewNumber] = useState(""); //useState hook for newNumbers, part of the form for Person
   const [filter, setFilter] = useState(""); //useState hook for Filter input
+  const [errorMessage, setErrorMessage] = useState('Some error happened...')
+  const [cssStyle, setCssStyle] = useState("added");
 
   useEffect(() => {
-    console.log("effect");
-    axios.get("http://localhost:3001/persons").then((response) => {
-      console.log("promise fulfilled");
-      setPersons(response.data);
+    personServices.getAllPersons().then((initPersons) => {
+      setPersons(initPersons);
     });
   }, []);
-  console.log("render", persons.length, "persons");
+  //console.log("render", persons.length, "persons");
+
+  const inputClear = (personObj) => {
+    setPersons(persons.concat(personObj));
+    setNewName("");
+    setNewNumber("");
+  };
+
+  const clearErrorMsg = () => {
+    setTimeout(() => {
+      setErrorMessage(null);
+    }, 5000);
+  }
+
+  const handleUpdatePerson = (findPerson, personObj) => {
+    if (window.confirm(`${newName} is already added to the phonebook, replace the old number with a new one?`)) {
+      setCssStyle("success");
+      personServices
+        .updatePerson(findPerson.id, {...findPerson, number: newNumber})
+        .then((updatedPerson) => {
+          setPersons(persons.map((pName) => (pName.name === newName ? updatedPerson : pName)));
+          setErrorMessage(`Changed ${personObj.name} number`);
+          inputClear(personObj);
+        })
+        .catch((error) => {
+          setErrorMessage("Updating failed.")
+        })
+        clearErrorMsg();
+    }
+  };
+
+  const handleCreatePerson = (personObj) => {
+    setCssStyle("success");
+    personServices
+      .createPerson(personObj)
+      .then((newPerson) => {
+        setErrorMessage(`Added ${newPerson.name}`);
+        inputClear(newPerson);
+      })
+      .catch((error) => {
+        setErrorMessage(`${error.response.data.error}`)
+      });
+      clearErrorMsg();
+  };
+
+  const handleDeletePerson = (name, id) => {
+    return () => { //if no returning we are stuck deleting
+      if (window.confirm(`Delete: ${name} ?`)) {
+        setCssStyle("error");
+        personServices
+          .deletePerson(id)
+          .then(() => {
+            setPersons(persons.filter((p) => p.id !== id));
+            setErrorMessage(`Deleted: ${name} .`);
+          })
+          .catch((error) => {
+            setErrorMessage(`Person: ${name} , doesn't exist.`)        
+          });
+          clearErrorMsg();
+      }
+    };
+  };
+
 
   return (
     <div>
+      <Notification message={errorMessage} style={cssStyle}/>
       <h2>Phonebook</h2>
       <Filter value={filter} persons={persons} setFilterPersons={setFilterPersons} setFilter={setFilter} />
-      <h3>Add a new</h3>
-      <PersonForm
-        persons={persons}
-        setPersons={setPersons}
-        newName={newName}
-        setNewName={setNewName}
-        newNumber={newNumber}
-        setNewNumber={setNewNumber}
-      />
+      <div>
+        <h3>Add a new</h3>
+        <PersonForm
+          persons={persons}
+          setPersons={setPersons}
+          newName={newName}
+          setNewName={setNewName}
+          newNumber={newNumber}
+          setNewNumber={setNewNumber}
+          handleUpdatePerson={handleUpdatePerson}
+          handleCreatePerson={handleCreatePerson}
+        />
+      </div>
       <h3>Numbers</h3>
-      <Persons persons={persons} filterPersons={filterPersons} filter={filter} />
+      <div>
+        <Persons persons={persons} filterPersons={filterPersons} filter={filter} handleDeletePerson={handleDeletePerson} />
+      </div>
+      <Footer />
     </div>
   );
 };

@@ -5,7 +5,7 @@ import CountryList from "./components/CountryList";
 
 function App() {
   const [countries, setCountries] = useState([]);
-  const [filter, setFilter] = useState(""); //useState hook for Filter input
+  const [filterCountry, setFilterCountry] = useState(""); //useState hook for Filter input
   const [showCountryButton, setShowCountryButton] = useState();
 
   const showBut = (event) => {
@@ -23,16 +23,16 @@ function App() {
   console.log("render", countries.length, "countries");
 
   const handleFilterChange = (event) => {
-    setFilter(event.target.value);
+    setFilterCountry(event.target.value);
     setShowCountryButton(undefined);
   };
 
   return (
     <div>
       <form>
-      Find countries: <input onChange={handleFilterChange} value={filter}></input>
+      Find countries: <input onChange={handleFilterChange} value={filterCountry}></input>
       </form>
-      <CountryList countries={countries} filter={filter} showCountryButton={showCountryButton} showBut={showBut} />
+      <CountryList countries={countries} filter={filterCountry} showCountryButton={showCountryButton} showBut={showBut} />
     </div>
   );
 }

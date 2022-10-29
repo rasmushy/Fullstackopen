@@ -1,19 +1,21 @@
 import React from "react";
 
 const Persons = (props) => {
-  let x = ""; //empty string for mapping
-  props.filter === "" ? (x = props.persons) : (x = props.filterPersons); //if filter input is empty show persons, else show filteredpersons
+  let listedPersons = ""; //empty string for mapping
+  props.filter === "" ? (listedPersons = props.persons) : (listedPersons = props.filterPersons); 
+  //if filter input is empty show persons, else show filteredpersons
 
   //Mapping all the objects in the phonebook
   return (
-    <div>
-      {x.map((obj, i) => (
-        <p key={i}>
-          {obj.name} {obj.number}
-        </p>
+    <ol>
+      {listedPersons.map((obj, i) => (
+        <li className="person" key={i}>
+          <label>{obj.name} {obj.number}</label>
+          <button onClick={props.handleDeletePerson(obj.name, obj.id)}>Delete</button>
+        </li>
       ))}
-    </div>
-  );
-};
+    </ol>
+  )
+}
 
 export default Persons;
