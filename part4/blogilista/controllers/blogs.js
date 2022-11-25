@@ -1,11 +1,7 @@
-const blogsController = require('express').Router()
+const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 
-blogsController.get('/', async (req, res) => {
-  const blogs = await Blog.find({})
-  res.json(blogs)
-})
-
+/*
 blogsController.post('/', async (req, res, next) => {
   const body = req.body
   try {
@@ -26,76 +22,66 @@ blogsController.post('/', async (req, res, next) => {
     next(exception)
   }
 })
+*/
 
-module.exports = blogsController
 
-//app.get("/api/blogs", (request, response) => {
-//  Blog.find({}).then((blogs) => {
-//    response.json(blogs)
-//  })
-//})
+blogsRouter.get('/', async (req, res) => {
+  const blogs = await Blog.find({})
+  res.json(blogs)
+})
 
-//app.post("/api/blogs", (request, response) => {
-//  const blog = new Blog(request.body)
-//
-//  blog.save().then((result) => {
-//    response.status(201).json(result)
-//  })
-//)
+blogsRouter.get('/:id', async (req, res) => {
+  if(!req.params) res.status(404).end()
 
-//notesRouter.get("/", (request, response) => {
-//Note.find({}).then((notes) => {
-//response.json(notes)
-//})
-//})
+  const blog = await Blog.findById(req.params.id)
+  if (blog) {
+    res.json(blog.toJSON())
+  } else {
+    res.status(404).end()
+  }
+})
 
-//notesRouter.get("/:id", (request, response, next) => {
-//Note.findById(request.params.id)
-//.then((note) => {
-//if (note) {
-//response.json(note)
-//} else {
-//response.status(404).end()
-//}
-//})
-//.catch((error) => next(error))
-//})
+blogsRouter.post('/', async (req, res) => {
+  const body = req.body
 
-//notesRouter.post('/', (request, response, next) => {
-//const body = request.body
+  if (body.title === undefined || body.url === undefined) {
+    return res.status(400).end()
+  }
 
-//const note = new Note({
-//content: body.content,
-//important: body.important || false,
-//date: new Date(),
-//})
+  const blog = new Blog({
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    likes: body.likes || 0
+  })
 
-//note.save()
-//.then(savedNote => {
-//response.json(savedNote)
-//})
-//.catch(error => next(error))
-//})
+  const savedBlog = await blog.save()
+  res.status(201).json(savedBlog)
+})
 
-//notesRouter.delete('/:id', (request, response, next) => {
-//Note.findByIdAndRemove(request.params.id)
-//.then(() => {
-//response.status(204).end()
-//})
-//.catch(error => next(error))
-//})
+blogsRouter.delete('/:id', async (req, res) => {
+  if(!req.params) return res.status(400).send({error: 'Missing id'})
+  await Blog.findByIdAndRemove(req.params.id)
+  res.status(204).end()
+})
 
-//notesRouter.put('/:id', (request, response, next) => {
-//const body = request.body
+blogsRouter.put('/:id', (req, res, next) => {
+  const body = req.body
 
-//const note = {
-//content: body.content,
-//important: body.important,
-//}
+  if(!req.params) return res.status(400).send({error: 'Missing id'})
 
-//Note.findByIdAndUpdate(request.params.id, note, { new: true })
-//.then(updatedNote => {
-//response.json(updatedNote)
-//})
-//.catch(error => next(error))
-//})
+  const blog = {
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    likes: body.likes || 0
+  }
+
+  Blog.findByIdAndUpdate(req.params.id, blog, { new: true })
+    .then((updatedBlog) => {
+      res.json(updatedBlog)
+    })
+    .catch((error) => next(error))
+})
+
+module.exports = blogsRouter
