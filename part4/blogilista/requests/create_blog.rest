@@ -1,10 +1,10 @@
 POST http://localhost:3003/api/blogs HTTP/1.1 
 Content-type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjYzODUwZGMwNzBmY2U5MmE4Nzc5NTE2YyIsImlhdCI6MTY2OTcxNjQzOCwiZXhwIjoxNjY5NzIwMDM4fQ.jtuhpba6KXoIaZ7SLHgGJcHclTKnniQ_QMohhRFL5Ws
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFvZXUiLCJpZCI6IjYzODcxMjE0MTQ2YTNmNzUxYTEwOGZhZCIsImlhdCI6MTY2OTc5NzM1MSwiZXhwIjoxNjY5ODAwOTUxfQ.P0WxSKYTcuXO2nyXtzmYMwpXk7-dN2OPAghysp1RbFE
 
 {
-  "title": "Kauppakassi",
-  "author": "Sanna",
-  "url": "www.blogi.com",
-  "likes": 5
+  "title": "Leptos > React",
+  "author": "Smart guy",
+  "url": "www.leptos.com",
+  "likes": 1000
 } 
