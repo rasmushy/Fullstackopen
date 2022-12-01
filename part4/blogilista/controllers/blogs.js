@@ -5,7 +5,7 @@ const Blog = require('../models/blog')
 
 // get all blogs
 blogRouter.get('/', async (req, res) => {
-/*   const token = req.token
+  /*   const token = req.token
 
   const decodedToken = jwt.verify(token, process.env.SECRET)
   if (!token || !decodedToken.id) {
@@ -88,12 +88,6 @@ blogRouter.delete('/:id', userExtractor, async (req, res, next) => {
 // Update blog with this id
 blogRouter.put('/:id', async (req, res, next) => {
   const body = req.body
-  const token = req.token
-
-  const decodedToken = jwt.verify(token, process.env.SECRET)
-  if (!token || !decodedToken.id) {
-    return res.status(401).json({ error: 'token missing or invalid' })
-  }
 
   const updatedBlog = {
     ...body,
@@ -104,7 +98,7 @@ blogRouter.put('/:id', async (req, res, next) => {
     const blog = await Blog.findByIdAndUpdate(req.params.id, updatedBlog, {
       new: true
     })
-    res.json(blog)
+    res.json(blog.toJSON())
   } catch (error) {
     next(error)
   }

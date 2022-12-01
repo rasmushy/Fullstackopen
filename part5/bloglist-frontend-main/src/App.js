@@ -18,8 +18,8 @@ const App = () => {
 		style: 'error',
 	});
 	const [user, setUser] = useState(
-		window.localStorage.getItem('loggedBlogAppUser')
-			? JSON.parse(window.localStorage.getItem('loggedBlogAppUser'))
+		window.localStorage.getItem('loggedBlogUser')
+			? JSON.parse(window.localStorage.getItem('loggedBlogUser'))
 			: null,
 	);
 
@@ -45,13 +45,16 @@ const App = () => {
 		}
 	}, []);
 
+	//Add a new blog
 	const addBlog = async (blogObject) => {
 		try {
 			const createdBlog = await blogService.create(blogObject);
 			setBlogs(blogs.concat(createdBlog));
 			blogFormRef.current.toggleVisibility();
 			setErrorMessage({
-				text: `A new blog ${blogObject.title} by ${blogObject.author} added`,
+				text: `A new blog ${blogObject.title} by ${
+					user.name ? user.name : user.username
+				} added`,
 				style: 'success',
 			});
 		} catch (exception) {
@@ -60,12 +63,56 @@ const App = () => {
 				style: 'error',
 			});
 		} finally {
-			setTimeout(() => {
+			const timer = setTimeout(() => {
 				setErrorMessage({ text: null, style: 'error' });
 			}, 5000);
+			return () => clearTimeout(timer);
 		}
 	};
 
+	//Like functionality
+	const likeBlog = async (blogObject) => {
+		try {
+			await blogService.update(blogObject.id, blogObject);
+
+			setBlogs(
+				blogs.map((blog) =>
+					blog.id === blogObject.id ? blogObject : blog,
+				),
+			);
+		} catch (error) {
+			setErrorMessage({ text: 'Error updating blog', style: 'error' });
+			const timer = setTimeout(() => {
+				setErrorMessage({ text: null, style: 'error' });
+			}, 5000);
+			return () => clearTimeout(timer);
+		}
+	};
+
+	//Delete functionality
+	const deleteBlog = async (blogObject) => {
+		if (
+			window.confirm(
+				`Remove blog ${blogObject.title} by ${blogObject.author}`,
+			)
+		) {
+			try {
+				await blogService.remove(blogObject.id);
+				setBlogs(blogs.filter((blog) => blog.id !== blogObject.id));
+			} catch (error) {
+				setErrorMessage({
+					text: 'Error deleting blog',
+					style: 'error',
+				});
+				const timer = setTimeout(() => {
+					setErrorMessage({ text: null, style: 'error' });
+				}, 5000);
+				return () => clearTimeout(timer);
+			}
+		}
+	};
+
+	//Userlogin
 	const handleLogin = async ({
 		username,
 		password,
@@ -89,9 +136,10 @@ const App = () => {
 				style: 'error',
 			});
 		} finally {
-			setTimeout(() => {
+			const timer = setTimeout(() => {
 				setErrorMessage({ text: null, style: 'error' });
 			}, 5000);
+			return () => clearTimeout(timer);
 		}
 	};
 
@@ -103,17 +151,14 @@ const App = () => {
 	//Login form
 	const loginForm = () => (
 		<Togglable buttonLabel='log in'>
-			<LoginForm
-				handleLogin={handleLogin}
-				setErrorMessage={setErrorMessage}
-			/>
+			<LoginForm handleLogin={handleLogin} />
 		</Togglable>
 	);
 
 	//BlogForm
 	const blogForm = () => (
 		<Togglable buttonLabel='new blog' ref={blogFormRef}>
-			<BlogForm setErrorMessage={setErrorMessage} addBlog={addBlog} />
+			<BlogForm addBlog={addBlog} />
 		</Togglable>
 	);
 
@@ -136,11 +181,17 @@ const App = () => {
 				<div>
 					{blogForm()}
 					<br />
-					<ul>
-						{blogs.map((blog) => (
-							<Blog key={blog.id} blog={blog} />
+					{blogs
+						.sort((a, b) => b.likes - a.likes)
+						.map((blog) => (
+							<Blog
+								key={blog.id}
+								blog={blog}
+								user={user}
+								likeBlog={likeBlog}
+								deleteBlog={deleteBlog}
+							/>
 						))}
-					</ul>
 				</div>
 			)}
 

@@ -1,8 +1,7 @@
 import { useState } from 'react';
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, user, likeBlog, deleteBlog }) => {
 	const [showBlogDetails, setBlogDetails] = useState(false);
-
 	const blogStyle = {
 		paddingTop: 10,
 		paddingLeft: 2,
@@ -11,30 +10,52 @@ const Blog = ({ blog }) => {
 		marginBottom: 5,
 	};
 
+	const handleLike = async (event) => {
+		event.preventDefault();
+		const updatedBlog = {
+			author: blog.author,
+			title: blog.title,
+			url: blog.url,
+			id: blog.id,
+			likes: blog.likes + 1,
+		};
+		likeBlog(updatedBlog);
+	};
+
 	return (
 		<div style={blogStyle}>
 			<div>
-				{blog.title} {blog.author}
+				{` `}
+				<strong>{blog.title}</strong>
+				{`  by`} {blog.author}
+				{` `}
 				<button onClick={() => setBlogDetails(!showBlogDetails)}>
 					{showBlogDetails ? 'hide' : 'view'}
 				</button>
 				{showBlogDetails ? (
-					<div>
+					<form onSubmit={handleLike}>
 						<p>{blog.url}</p>
 						<p>
 							{blog.likes} likes
-							<button>like</button>
+							<button type='submit' name='likeBtn'>
+								like
+							</button>
 						</p>
 						<p>
-							added by{' '}
 							{!blog.user
-								? 'no user'
-								: blog.user.username.toString()}
+								? 'test user'
+								: blog?.user?.name || blog?.user?.username}
 						</p>
-					</div>
+						{blog?.user?.username === user?.username ? (
+							<button onClick={() => deleteBlog(blog)}>
+								remove
+							</button>
+						) : null}
+					</form>
 				) : null}
 			</div>
 		</div>
 	);
 };
+
 export default Blog;
